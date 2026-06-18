@@ -25,4 +25,13 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    public function chantiers()
+    {
+        return $this->hasMany(Chantier::class, 'chef_chantier_id');
+    }
+
+    public function clients()
+    {
+        return $this->hasMany(Client::class, 'created_by');
+    }
 }
