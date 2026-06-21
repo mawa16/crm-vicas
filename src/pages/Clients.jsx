@@ -2,17 +2,25 @@ import { useState } from 'react';
 import { T } from '../styles/tokens';
 import { S } from '../styles/shared';
 import { CLIENTS } from '../data/mockData';
+import { clients as clientsApi } from '../services/api';
+import { useApi } from '../hooks/useApi';
+import { Loading, ApiError } from '../components/ApiState';
 
 export default function Clients() {
+  const { data: apiClients, loading, error } = useApi(() => clientsApi.list(), CLIENTS);
+  const allClients = apiClients || CLIENTS;
   const [search, setSearch] = useState("");
   const [filtre, setFiltre] = useState("Tous");
-  const data = CLIENTS.filter(c =>
+  const data = allClients.filter(c =>
     (filtre === "Tous" || c.statut === filtre) &&
     c.nom.toLowerCase().includes(search.toLowerCase())
   );
 
+  if (loading) return <Loading message="Chargement des clients…" />;
+
   return (
     <div>
+      <ApiError error={error} />
       <div style={S.sectionHeader}>
         <div>
           <div style={S.pageTitle}>Clients & contrats</div>

@@ -2,18 +2,21 @@ import { useState } from 'react';
 import { T } from '../styles/tokens';
 import { S } from '../styles/shared';
 import { PHOTOS } from '../data/mockData';
+import { useAuth, ROLE } from '../context/AuthContext';
 
 export default function Galerie() {
+  const { user } = useAuth();
+  const mesPhotos = user?.role === ROLE.DIRECTION ? PHOTOS : PHOTOS.filter(p => p.chefId === user?.userId);
   const [filtre, setFiltre] = useState("Tous");
   const tags = ["Tous", "Avant", "En cours", "Après"];
-  const data = PHOTOS.filter(p => filtre === "Tous" || p.tag === filtre);
+  const data = mesPhotos.filter(p => filtre === "Tous" || p.tag === filtre);
 
   return (
     <div>
       <div style={S.sectionHeader}>
         <div>
           <div style={S.pageTitle}>Galerie photos</div>
-          <div style={S.pageSub}>Suivi visuel des chantiers — {PHOTOS.length} photos</div>
+          <div style={S.pageSub}>Suivi visuel des chantiers — {mesPhotos.length} photos</div>
         </div>
         <button style={S.btn("primary")}>+ Ajouter photos</button>
       </div>

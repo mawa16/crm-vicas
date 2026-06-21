@@ -3,9 +3,14 @@ import { T } from '../styles/tokens';
 import { S } from '../styles/shared';
 import { NiveauBadge } from '../components/UI';
 import { ALERTES as ALERTES_INIT } from '../data/mockData';
+import { useAuth, ROLE } from '../context/AuthContext';
 
 export default function Alertes() {
-  const [alertes, setAlertes] = useState(ALERTES_INIT);
+  const { user } = useAuth();
+  const sourceAlertes = user?.role === ROLE.DIRECTION
+    ? ALERTES_INIT
+    : ALERTES_INIT.filter(a => a.chefId === user?.userId);
+  const [alertes, setAlertes] = useState(sourceAlertes);
   const marquerLue = (id) => setAlertes(prev => prev.map(a => a.id === id ? { ...a, lue: true } : a));
 
   return (

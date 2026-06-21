@@ -1,15 +1,7 @@
 import { useState } from 'react';
 import { T } from '../styles/tokens';
-
-// Comptes demo (mot de passe par défaut : "vicas2025")
-const DEMO_ACCOUNTS = [
-  { email: "c.ndiaye@vicas.sn",  password: "vicas2025", nom: "Cheikh Tidiane Ndiaye", role: "Direction"        },
-  { email: "i.diallo@vicas.sn",  password: "vicas2025", nom: "Ibrahima Diallo",       role: "Chef de chantier" },
-  { email: "m.sow@vicas.sn",     password: "vicas2025", nom: "Mariama Sow",           role: "Chef de chantier" },
-  { email: "o.faye@vicas.sn",    password: "vicas2025", nom: "Ousmane Faye",          role: "Chef de chantier" },
-  { email: "a.diop@vicas.sn",    password: "vicas2025", nom: "Aminata Diop",          role: "Commercial"       },
-  { email: "p.sarr@vicas.sn",    password: "vicas2025", nom: "Pape Sarr",             role: "Chef de chantier" },
-];
+import { DEMO_ACCOUNTS } from '../data/mockData';
+import { auth as authApi } from '../services/api';
 
 // ─── Shared UI ──────────────────────────────────────────────────────────────
 
@@ -26,11 +18,17 @@ function PanneauGauche() {
 
       {/* Logo */}
       <div style={{ display:'flex', alignItems:'center', gap:14, position:'relative' }}>
-        <div style={{ width:46, height:46, borderRadius:12, background:'linear-gradient(135deg, #E8650A 0%, #F89B52 100%)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, fontWeight:800, color:'#fff', boxShadow:'0 4px 16px rgba(232,101,10,0.45)', flexShrink:0 }}>V</div>
-        <div>
-          <div style={{ fontWeight:800, fontSize:20, color:'#fff', letterSpacing:'-0.02em', lineHeight:1 }}>VICAS</div>
-          <div style={{ fontSize:11, color:T.orangeMid, fontWeight:500, letterSpacing:'0.14em', marginTop:3 }}>CRM</div>
-        </div>
+        <img
+          src="/logo-vicas.png"
+          alt="VICAS SARL"
+          style={{
+            height: 56,
+            width: 'auto',
+            objectFit: 'contain',
+            filter: 'drop-shadow(0 3px 10px rgba(0,0,0,0.4))',
+          }}
+        />
+        <div style={{ fontSize:11, color:T.orangeMid, fontWeight:600, letterSpacing:'0.18em' }}>CRM</div>
       </div>
 
       {/* Slogan */}
@@ -144,13 +142,25 @@ function VueConnexion({ onLogin, onForgot, onRegister }) {
   const [error, setError] = useState('');
   const [focused, setFocused] = useState('');
 
-  const handle = (e) => {
+  const handle = async (e) => {
     e.preventDefault();
     if (!email || !password) { setError('Veuillez remplir tous les champs.'); return; }
-    const account = DEMO_ACCOUNTS.find(a => a.email === email && a.password === password);
-    if (!account) { setError('Email ou mot de passe incorrect.'); return; }
     setError(''); setLoading(true);
-    setTimeout(() => { setLoading(false); onLogin(account); }, 900);
+    try {
+      const data = await authApi.login(email, password);
+      // data = { token, user: { id, name, email, role, ... } }
+      const account = {
+        userId: data.user.id,
+        nom:    data.user.name,
+        email:  data.user.email,
+        role:   data.user.role,
+      };
+      onLogin(account);
+    } catch (err) {
+      setError(err.message || 'Email ou mot de passe incorrect.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const eyeBtn = (
@@ -196,7 +206,7 @@ function VueConnexion({ onLogin, onForgot, onRegister }) {
       {/* Comptes demo */}
       <div style={{ marginTop:24, padding:'12px 14px', background:T.bluePale, borderRadius:9, border:`1px solid ${T.blueLight}` }}>
         <div style={{ fontSize:11, fontWeight:600, color:T.navy, marginBottom:8, letterSpacing:'0.04em', textTransform:'uppercase' }}>Comptes de démo</div>
-        {DEMO_ACCOUNTS.slice(0,3).map(a => (
+        {DEMO_ACCOUNTS.map(a => (
           <div key={a.email} onClick={() => { setEmail(a.email); setPassword(a.password); }} style={{ fontSize:12, color:T.blue, cursor:'pointer', padding:'3px 0', display:'flex', justifyContent:'space-between' }}>
             <span>{a.nom}</span>
             <span style={{ color:T.textMuted }}>{a.role}</span>

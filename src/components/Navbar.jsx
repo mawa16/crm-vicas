@@ -28,7 +28,7 @@ const navStyle = {
   gap: 4,
   overflowX: "auto",
 };
- 
+
 const tabStyle = (active) => ({
   padding: "0 12px",
   height: 52,
