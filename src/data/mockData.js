@@ -10,15 +10,7 @@ export const USERS = [
   { id:7, nom:"Adama Cissé",           role:"Administrateur",   email:"a.cisse@vicas.sn",   initiales:"AC", bg:T.blueLight,   color:T.navy,     actif:true  },
 ];
 
-export const DEMO_ACCOUNTS = [
-  { email:"c.ndiaye@vicas.sn", password:"vicas2025", nom:"Cheikh Tidiane Ndiaye", role:"Direction",        userId:1 },
-  { email:"i.diallo@vicas.sn", password:"vicas2025", nom:"Ibrahima Diallo",       role:"Chef de chantier", userId:2 },
-  { email:"m.sow@vicas.sn",    password:"vicas2025", nom:"Mariama Sow",           role:"Chef de chantier", userId:3 },
-  { email:"o.faye@vicas.sn",   password:"vicas2025", nom:"Ousmane Faye",          role:"Chef de chantier", userId:4 },
-  { email:"a.diop@vicas.sn",   password:"vicas2025", nom:"Aminata Diop",          role:"Commercial",       userId:5 },
-  { email:"p.sarr@vicas.sn",   password:"vicas2025", nom:"Pape Sarr",             role:"Chef de chantier", userId:6 },
-  { email:"a.cisse@vicas.sn",  password:"vicas2025", nom:"Adama Cissé",           role:"Administrateur",   userId:7 },
-];
+export const DEMO_ACCOUNTS = [];
 
 export const CHANTIERS = [
   { id:1, nom:"Réseau EU Pikine",             type:"Pose réseaux",   localisation:"Pikine",        chefId:2, chef:"Ibrahima Diallo", debut:"01/11/2024", fin:"15/03/2025", pct:45, statut:"retard",  client:"ONAS",           clientId:1, montant:"45 000 000", phase:"Pose canalisations" },

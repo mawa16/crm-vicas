@@ -3,6 +3,28 @@ import { auth as authApi } from '../services/api';
 
 const AuthContext = createContext(null);
 
+// Mapping rôles Laravel → rôles frontend
+const ROLE_MAP = {
+  'direction':     'Direction',
+  'admin':         'Administrateur',
+  'chef_chantier': 'Chef de chantier',
+  'commercial':    'Commercial',
+  // déjà en bon format (fallback)
+  'Direction':        'Direction',
+  'Administrateur':   'Administrateur',
+  'Chef de chantier': 'Chef de chantier',
+  'Commercial':       'Commercial',
+};
+
+function mapUser(data) {
+  return {
+    userId: data.id,
+    nom:    data.name,
+    email:  data.email,
+    role:   ROLE_MAP[data.role] || data.role,
+  };
+}
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -13,12 +35,7 @@ export function AuthProvider({ children }) {
     if (token) {
       authApi.me()
         .then(data => {
-          setUser({
-            userId: data.id,
-            nom:    data.name,
-            email:  data.email,
-            role:   data.role,
-          });
+          setUser(mapUser(data));
         })
         .catch(() => {
           authApi.removeToken();

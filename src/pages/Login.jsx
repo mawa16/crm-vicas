@@ -3,6 +3,13 @@ import { T } from '../styles/tokens';
 import { DEMO_ACCOUNTS } from '../data/mockData';
 import { auth as authApi } from '../services/api';
 
+const ROLE_MAP = {
+  'direction':     'Direction',
+  'admin':         'Administrateur',
+  'chef_chantier': 'Chef de chantier',
+  'commercial':    'Commercial',
+};
+
 // ─── Shared UI ──────────────────────────────────────────────────────────────
 
 function PanneauGauche() {
@@ -148,16 +155,21 @@ function VueConnexion({ onLogin, onForgot, onRegister }) {
     setError(''); setLoading(true);
     try {
       const data = await authApi.login(email, password);
-      // data = { token, user: { id, name, email, role, ... } }
       const account = {
         userId: data.user.id,
         nom:    data.user.name,
         email:  data.user.email,
-        role:   data.user.role,
+        role:   ROLE_MAP[data.user.role] || data.user.role,
       };
       onLogin(account);
     } catch (err) {
-      setError(err.message || 'Email ou mot de passe incorrect.');
+      // Fallback comptes démo si API indisponible
+      const demo = DEMO_ACCOUNTS.find(a => a.email === email && a.password === password);
+      if (demo) {
+        onLogin(demo);
+      } else {
+        setError('Email ou mot de passe incorrect.');
+      }
     } finally {
       setLoading(false);
     }
@@ -202,18 +214,6 @@ function VueConnexion({ onLogin, onForgot, onRegister }) {
       <Btn variant="secondary" full onClick={onRegister}>
         <span style={{ fontSize:15 }}>➕</span> Créer un compte
       </Btn>
-
-      {/* Comptes demo */}
-      <div style={{ marginTop:24, padding:'12px 14px', background:T.bluePale, borderRadius:9, border:`1px solid ${T.blueLight}` }}>
-        <div style={{ fontSize:11, fontWeight:600, color:T.navy, marginBottom:8, letterSpacing:'0.04em', textTransform:'uppercase' }}>Comptes de démo</div>
-        {DEMO_ACCOUNTS.map(a => (
-          <div key={a.email} onClick={() => { setEmail(a.email); setPassword(a.password); }} style={{ fontSize:12, color:T.blue, cursor:'pointer', padding:'3px 0', display:'flex', justifyContent:'space-between' }}>
-            <span>{a.nom}</span>
-            <span style={{ color:T.textMuted }}>{a.role}</span>
-          </div>
-        ))}
-        <div style={{ fontSize:11, color:T.textMuted, marginTop:6 }}>Cliquez sur un compte pour préremplir · Mot de passe : <b>vicas2025</b></div>
-      </div>
     </>
   );
 }
